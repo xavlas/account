@@ -1,4 +1,4 @@
-#!/home/xavlas/dev/compte/.venv/bin/python3
+#!/home/xavlas/dev/compte/.venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
