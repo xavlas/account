@@ -4,10 +4,8 @@ import hashlib
 import os
 from datetime import datetime
 
-# Configuration de la page
 st.set_page_config(page_title="Système d'Authentification", layout="centered")
 
-# Fonction pour créer la base de données et la table utilisateurs si elles n'existent pas
 def init_db():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
@@ -23,13 +21,11 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Fonction pour hacher un mot de passe avec sel
 def hash_password(password):
     # Dans une application réelle, utilisez un sel unique par utilisateur
     salt = "salt_sécurisé"  # Idéalement, générez un sel unique pour chaque utilisateur
     return hashlib.sha256((password + salt).encode()).hexdigest()
 
-# Fonction pour ajouter un nouvel utilisateur
 def add_user(username, password, email=None):
     hashed_pwd = hash_password(password)
     conn = sqlite3.connect('users.db')
@@ -49,7 +45,6 @@ def add_user(username, password, email=None):
     finally:
         conn.close()
 
-# Fonction pour vérifier les identifiants de connexion
 def authenticate(username, password):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
@@ -62,7 +57,6 @@ def authenticate(username, password):
         return stored_password == hash_password(password)
     return False
 
-# Fonction pour obtenir la liste des utilisateurs (pour l'administrateur)
 def get_all_users():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
@@ -71,10 +65,9 @@ def get_all_users():
     conn.close()
     return users
 
-# Initialiser la base de données
+
 init_db()
 
-# Créer un utilisateur admin par défaut si non existant
 def create_admin_if_not_exists():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
@@ -87,7 +80,6 @@ def create_admin_if_not_exists():
 
 create_admin_if_not_exists()
 
-# Interface utilisateur avec Streamlit
 def main():
     st.title("Système d'Authentification")
     
@@ -101,7 +93,6 @@ def main():
     menu = ["Connexion", "Inscription", "Admin"]
     choice = st.sidebar.selectbox("Menu", menu)
     
-    # Page de connexion
     if choice == "Connexion":
         st.subheader("Connexion")
         
@@ -127,7 +118,6 @@ def main():
                 else:
                     st.warning("Veuillez entrer vos identifiants")
     
-    # Page d'inscription
     elif choice == "Inscription":
         st.subheader("Créer un nouveau compte")
         
@@ -147,7 +137,6 @@ def main():
             else:
                 st.warning("Veuillez remplir les champs obligatoires")
     
-    # Page d'administration
     elif choice == "Admin" and st.session_state.logged_in and st.session_state.username == "admin":
         st.subheader("Panneau d'administration")
         
@@ -169,7 +158,6 @@ def main():
         else:
             st.info("Aucun utilisateur enregistré")
     
-    # Accès non autorisé à la page admin
     elif choice == "Admin":
         st.warning("Vous devez être connecté en tant qu'administrateur pour accéder à cette page")
 
