@@ -1,33 +1,40 @@
 import streamlit as st
 
-import streamlit as st
-import streamlit_authenticator as stauth
+def get_users():
+    return st.secrets["users"]
 
-# Charger les identifiants depuis secrets
-credentials = {
-    "usernames": st.secrets["credentials"]["usernames"]
-}
+def login():
+    st.title("🔐 Page de connexion")
 
-# Créer l'objet Authenticator
-authenticator = stauth.Authenticate(
-    credentials,
-    "mon_app_cookie",  # nom du cookie
-    "ma_signature_clé",  # clé de sécurité pour signer le cookie
-    cookie_expiry_days=1
-)
+    username = st.text_input("Nom d'utilisateur")
+    password = st.text_input("Mot de passe", type="password")
 
-# Interface de connexion
-name, authentication_status, username = authenticator.login("Login", "main")
+    if st.button("Se connecter"):
+        users = get_users()
+        if username in users and users[username] == password:
+            st.session_state["logged_in"] = True
+            st.session_state["username"] = username
+            st.success(f"Bienvenue, {username} !")
+        else:
+            st.error("Nom d'utilisateur ou mot de passe incorrect.")
 
-if authentication_status:
-    authenticator.logout("Se déconnecter", "sidebar")
-    st.sidebar.success(f"Connecté en tant que {name}")
-    st.write(f"Bienvenue {name} 👋")
-    # Ici ton app après connexion
+def main_app():
+    st.title("🏠 Application principale")
+    st.write(f"Vous êtes connecté en tant que {st.session_state['username']}.")
 
-elif authentication_status is False:
-    st.error("Nom d'utilisateur ou mot de passe incorrect")
+    if st.button("Se déconnecter"):
+        st.session_state["logged_in"] = False
+        st.session_state["username"] = ""
 
-elif authentication_status is None:
-    st.warning("Veuillez entrer vos identifiants")
+def main():
+    if "logged_in" not in st.session_state:
+        st.session_state["logged_in"] = False
+        st.session_state["username"] = ""
 
+    if st.session_state["logged_in"]:
+        main_app()
+    else:
+        login()
+
+if __name__ == "__main__":
+    main()
